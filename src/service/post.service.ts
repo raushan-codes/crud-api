@@ -18,7 +18,8 @@ export class PostService {
             const cache = await redis.get('posts');
             let cachedPosts;
             if(cache){
-                cachedPosts = JSON.parse(cache)
+                cachedPosts = JSON.parse(cache) as PostData[];
+                cachedPosts.push(post);
             }
             
             await redis.set('posts', JSON.stringify(cachedPosts))
