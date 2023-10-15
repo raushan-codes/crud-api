@@ -1,5 +1,4 @@
-import { RedisClientType } from "redis";
-import { PostData } from "../../types";
+import { PostData } from "../model/post.model";
 import { PostRepository } from "../repository/post.repository";
 import CustomError from "../utils/customError";
 import  redis from "../utils/redis";

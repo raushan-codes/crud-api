@@ -1,6 +1,5 @@
-import { PostData } from "../../types";
 import { Post } from "../model/post.model"; 
-
+import { PostData } from "../model/post.model";
 export class PostRepository{
     private _model = Post;
     async create(data: PostData): Promise<PostData>{

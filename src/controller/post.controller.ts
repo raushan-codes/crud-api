@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 
 import { PostService } from "../service/post.service";
 import { asyncHandler } from "../utils/asyncHandler";
-import { PostData } from '../../types';
+import { PostData } from '../model/post.model';
 
 const postService = new PostService();
 
