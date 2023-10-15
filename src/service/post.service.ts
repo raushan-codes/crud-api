@@ -1,18 +1,27 @@
+import { RedisClientType } from "redis";
 import { PostData } from "../../types";
 import { PostRepository } from "../repository/post.repository";
 import CustomError from "../utils/customError";
-import { redis } from "../utils/redis";
+import  redis from "../utils/redis";
+
 
 export class PostService {
     PostRepository: PostRepository;
     constructor() {
         this.PostRepository = new PostRepository();
+        redis.connect();
     };
+    
     async create(data: PostData): Promise<PostData> {
         try {
+            
             const post = await this.PostRepository.create(data);
-            const cachedPosts: PostData[] | null = await redis.get('posts');
-            cachedPosts?.push(post);
+            const cache = await redis.get('posts');
+            let cachedPosts;
+            if(cache){
+                cachedPosts = JSON.parse(cache)
+            }
+            
             await redis.set('posts', JSON.stringify(cachedPosts))
             return post
         } catch (error: any) {
@@ -21,9 +30,9 @@ export class PostService {
     }
     async getAllPosts(): Promise<PostData[] | {} | null> {
         try {
-            let cachedPosts: PostData[] | {} | null = await redis.get('posts');
-            if (cachedPosts) {
-                return cachedPosts;
+            let cachedPosts=await redis.get('posts');
+            if (cachedPosts != null) {
+                return JSON.parse(cachedPosts);
             }
             const posts = await this.PostRepository.getAllPosts();
             await redis.set('posts', JSON.stringify(posts));
@@ -36,9 +45,9 @@ export class PostService {
     async getPostById(id: string): Promise<PostData | null> {
         try {
             let cachePostKey = `post-${id}`
-            let cachedPost: PostData | null = await redis.get(cachePostKey);
-            if(cachedPost){
-                return cachedPost;
+            let cachedPost=await redis.get(cachePostKey);
+            if(cachedPost !=null){
+                return JSON.parse(cachedPost);
             }
             const post = await this.PostRepository.getPostById(id);
             await redis.set(cachePostKey, JSON.stringify(post))
